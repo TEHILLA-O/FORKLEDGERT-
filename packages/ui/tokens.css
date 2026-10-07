@@ -1,0 +1,15 @@
+:root {
+  --fl-bg: #101114;
+  --fl-bg-raised: #181a1f;
+  --fl-bg-sunken: #0c0d10;
+  --fl-line: #2a2d34;
+  --fl-text: #e8e6e3;
+  --fl-muted: #9a958c;
+  --fl-accent: #c4a35a;
+  --fl-accent-dim: #8a7340;
+  --fl-danger: #d45d4c;
+  --fl-ok: #7d9b6a;
+  --fl-warn: #c4924a;
+  --fl-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --fl-sans: "IBM Plex Sans", "Segoe UI", sans-serif;
+}

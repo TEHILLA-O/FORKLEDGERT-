@@ -1,0 +1,60 @@
+# Repository configuration for ForkLedger.
+# Every value is validated. Unknown categories and empty vulnerability
+# decisions are rejected rather than guessed.
+
+upstream: https://github.com/example/project
+expected_baseline: "1.0.1"
+
+owner:
+  team: platform
+  contact: platform@example.com
+
+review_interval: 90d
+last_reviewed: "2026-09-01"
+security_sla: 14d
+
+# Build and test stay off until an operator names the exact argv.
+# ForkLedger will not run package scripts from the repository.
+# build_command: ["go", "test", "./..."]
+# test_command: ["go", "test", "./internal/patches"]
+
+ignored_paths:
+  - vendor
+  - dist
+  - node_modules
+
+allowed_licences:
+  - Apache-2.0
+  - MIT
+
+patch_classifications:
+  - commit: 2fd8401
+    category: SECURITY
+    reason: Internal hardening of token refresh.
+    status: MUST_RETAIN
+
+known_equivalent_patches:
+  - local: abc1234
+    upstream: def5678
+    note: Confirmed during the March rebase.
+
+manual_vulnerability_decisions:
+  - id: CVE-2024-0001
+    state: UNDER_INVESTIGATION
+    reason: Vulnerable function is present. Reachability is not yet proven.
+    owner: platform
+    expires: "2026-12-01"
+
+policy:
+  rules:
+    - id: critical_security_drift
+      severity: critical
+      description: A critical vulnerability has an upstream fix that is not in the fork.
+      remediation: Rebase or cherry-pick the upstream fix, then re-run forkledger security.
+      when:
+        vulnerability_severity: critical
+        upstream_fix: present
+        fork_fix: absent
+
+github:
+  comment_mode: update

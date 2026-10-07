@@ -1,0 +1,48 @@
+# Binaries
+/bin/
+/dist/
+/forkledger
+/forkledger.exe
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go
+vendor/
+coverage.out
+coverage.html
+
+# Node
+node_modules/
+.next/
+apps/web/.next/
+apps/web/out/
+apps/web/tsconfig.tsbuildinfo
+
+# Analysis artefacts
+.forkledger/
+*.forkledger.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+credentials.json
+*.pem
+
+# Test scratch
+/tmp/
+testdata/generated/

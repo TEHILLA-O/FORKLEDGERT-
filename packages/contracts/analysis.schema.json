@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forkledger.dev/schemas/analysis.json",
+  "title": "ForkLedger Analysis Report",
+  "type": "object",
+  "required": ["schema_version", "repository", "summary"],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "repository": { "type": "object" },
+    "upstream": { "type": "object" },
+    "lineage": { "type": "object" },
+    "patches": { "type": "object" },
+    "security": { "type": "object" },
+    "health": { "type": "object" },
+    "debt": { "type": "object" },
+    "lifecycle": { "type": "object" },
+    "summary": { "type": "object" }
+  }
+}

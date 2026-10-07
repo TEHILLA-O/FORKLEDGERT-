@@ -1,0 +1,21 @@
+name: ForkLedger
+
+on:
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./
+        with:
+          offline: "true"
+          comment: "true"
