@@ -109,10 +109,13 @@ type PatchEquivalence struct {
 }
 
 type SecuritySection struct {
-	Findings              []security.Finding `json:"findings"`
-	MissingUpstreamFixes  int                `json:"missing_upstream_fixes"`
-	NeedsInvestigation    int                `json:"needs_investigation"`
-	VEX                   security.VEXDocument `json:"vex"`
+	Findings             []security.Finding      `json:"findings"`
+	MissingUpstreamFixes int                     `json:"missing_upstream_fixes"`
+	NeedsInvestigation   int                     `json:"needs_investigation"`
+	VEX                  security.VEXDocument    `json:"vex"`
+	OpenVEX              security.OpenVEXDoc     `json:"openvex,omitempty"`
+	CycloneDX            security.CycloneDXDoc   `json:"cyclonedx,omitempty"`
+	SPDX                 security.SPDXDoc        `json:"spdx,omitempty"`
 }
 
 type UpgradeHint struct {
@@ -181,6 +184,8 @@ type PolicyViolation struct {
 	Severity    string `json:"severity"`
 	Description string `json:"description"`
 	Remediation string `json:"remediation,omitempty"`
+	Waived      bool   `json:"waived,omitempty"`
+	WaiverNote  string `json:"waiver_note,omitempty"`
 }
 
 type Summary struct {

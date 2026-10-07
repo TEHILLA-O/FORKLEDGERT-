@@ -29,6 +29,7 @@ type Globals struct {
 	Config  string
 	Output  string
 	Offline bool
+	Fetch   bool
 	Path    string
 	Log     *logging.Logger
 }
@@ -59,6 +60,16 @@ func Run(args []string) int {
 		return cmdExplain(rest)
 	case "doctor":
 		return cmdDoctor(rest)
+	case "serve":
+		return cmdServe(rest)
+	case "ingest":
+		return cmdIngest(rest)
+	case "discover":
+		return cmdDiscover(rest)
+	case "sbom":
+		return cmdSBOM(rest)
+	case "vex":
+		return cmdVEX(rest)
 	case "version", "--version", "-v":
 		return cmdVersion(rest)
 	case "help", "--help", "-h":
@@ -87,6 +98,11 @@ Commands:
   policy          Check configured policy rules
   explain         Explain a conclusion from the latest report
   doctor          Check Git, configuration, and environment
+  serve           Local HTTP API for stored scan reports
+  ingest          Store an analysis JSON in the local ledger
+  discover        List organisation repositories and GitHub fork parents
+  sbom            Write CycloneDX and SPDX documents from an analysis
+  vex             Write an OpenVEX document from an analysis
   version         Print the version
 
 Global flags:
@@ -97,6 +113,7 @@ Global flags:
   --config PATH   Configuration file
   --output PATH   Write JSON report to PATH
   --offline       Do not call network services
+  --fetch         Update remote-tracking refs before analysis
   --path PATH     Repository path (default .)
 
 Exit codes:
@@ -122,6 +139,7 @@ func parseGlobals(args []string) (Globals, []string, error) {
 	fs.StringVar(&g.Config, "config", "", "")
 	fs.StringVar(&g.Output, "output", "", "")
 	fs.BoolVar(&g.Offline, "offline", false, "")
+	fs.BoolVar(&g.Fetch, "fetch", false, "")
 	fs.StringVar(&g.Path, "path", ".", "")
 	if err := fs.Parse(args); err != nil {
 		return g, nil, err
@@ -181,6 +199,7 @@ func cmdAnalyze(args []string) int {
 		Path:        g.Path,
 		Config:      cfg,
 		Offline:     g.Offline,
+		Fetch:       g.Fetch,
 		Log:         g.Log,
 		GitHubToken: os.Getenv("FORKLEDGER_GITHUB_TOKEN"),
 	})
@@ -293,7 +312,7 @@ func cmdUpgrade(args []string) int {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
-	res, err := upgrade.Simulate(ctx, g.Path, target, cfg, g.Log, false)
+	res, err := upgrade.Simulate(ctx, g.Path, target, cfg, g.Log, true)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return ExitAnalysis
@@ -353,9 +372,16 @@ func cmdPolicy(args []string) int {
 			return ExitOK
 		}
 		for _, v := range rep.Policy.Violations {
-			fmt.Printf("%s [%s]\n%s\n%s\n\n", v.RuleID, v.Severity, v.Description, v.Remediation)
+			fmt.Printf("%s [%s]\n%s\n%s\n", v.RuleID, v.Severity, v.Description, v.Remediation)
+			if v.Waived {
+				fmt.Printf("waived: %s\n", v.WaiverNote)
+			}
+			fmt.Println()
 		}
-		return ExitPolicy
+		if blockingPolicy(rep) {
+			return ExitPolicy
+		}
+		return ExitOK
 	})
 }
 
@@ -475,6 +501,7 @@ func emit(g Globals, rep *report.Report) error {
 			return err
 		}
 	}
+	persist(g, rep)
 	if g.JSON {
 		return report.WriteJSON("-", rep)
 	}
@@ -501,13 +528,17 @@ func defaultReportPath(repo string) string {
 	return filepath.Join(repo, ".forkledger", "analysis.json")
 }
 
-func exitFromReport(rep *report.Report) int {
-	if len(rep.Policy.Violations) > 0 {
-		for _, v := range rep.Policy.Violations {
-			if strings.EqualFold(v.Severity, "critical") {
-				return ExitPolicy
-			}
+func blockingPolicy(rep *report.Report) bool {
+	for _, v := range rep.Policy.Violations {
+		if !v.Waived {
+			return true
 		}
+	}
+	return false
+}
+
+func exitFromReport(rep *report.Report) int {
+	if blockingPolicy(rep) {
 		return ExitPolicy
 	}
 	if rep.Security.MissingUpstreamFixes > 0 {

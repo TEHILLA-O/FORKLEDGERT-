@@ -55,6 +55,9 @@ policy:
         vulnerability_severity: critical
         upstream_fix: present
         fork_fix: absent
+      # waiver_reason: "fix scheduled next sprint"
+      # waiver_owner: platform
+      # waiver_expires: "2026-12-01"
 
 github:
   comment_mode: update

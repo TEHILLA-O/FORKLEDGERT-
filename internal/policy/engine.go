@@ -3,6 +3,7 @@ package policy
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/forkledger/forkledger/internal/config"
 	"github.com/forkledger/forkledger/internal/report"
@@ -12,17 +13,46 @@ import (
 func Check(cfg config.Config, rep *report.Report) []report.PolicyViolation {
 	var out []report.PolicyViolation
 	for _, rule := range cfg.Policy.Rules {
-		if match(rule, rep) {
-			out = append(out, report.PolicyViolation{
-				RuleID:      rule.ID,
-				Severity:    strings.ToLower(rule.Severity),
-				Description: first(rule.Description, defaultDescription(rule)),
-				Remediation: rule.Remediation,
-			})
+		if !match(rule, rep) {
+			continue
 		}
+		v := report.PolicyViolation{
+			RuleID:      rule.ID,
+			Severity:    strings.ToLower(rule.Severity),
+			Description: first(rule.Description, defaultDescription(rule)),
+			Remediation: rule.Remediation,
+		}
+		if waived, note := waiverActive(rule); waived {
+			v.Waived = true
+			v.WaiverNote = note
+		}
+		out = append(out, v)
 	}
 	rep.Policy.Violations = out
 	return out
+}
+
+func waiverActive(rule config.PolicyRule) (bool, string) {
+	if strings.TrimSpace(rule.WaiverReason) == "" {
+		return false, ""
+	}
+	if rule.WaiverExpires != "" {
+		exp, err := time.Parse("2006-01-02", rule.WaiverExpires)
+		if err != nil {
+			return false, ""
+		}
+		if time.Now().UTC().After(exp.Add(24 * time.Hour)) {
+			return false, ""
+		}
+	}
+	note := rule.WaiverReason
+	if rule.WaiverOwner != "" {
+		note += " (owner " + rule.WaiverOwner + ")"
+	}
+	if rule.WaiverExpires != "" {
+		note += " expires " + rule.WaiverExpires
+	}
+	return true, note
 }
 
 func match(rule config.PolicyRule, rep *report.Report) bool {

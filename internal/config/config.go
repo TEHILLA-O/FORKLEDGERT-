@@ -61,11 +61,14 @@ type PolicyConfig struct {
 }
 
 type PolicyRule struct {
-	ID          string            `yaml:"id" json:"id"`
-	Severity    string            `yaml:"severity" json:"severity"`
-	Description string            `yaml:"description,omitempty" json:"description,omitempty"`
-	Remediation string            `yaml:"remediation,omitempty" json:"remediation,omitempty"`
-	When        map[string]string `yaml:"when" json:"when"`
+	ID            string            `yaml:"id" json:"id"`
+	Severity      string            `yaml:"severity" json:"severity"`
+	Description   string            `yaml:"description,omitempty" json:"description,omitempty"`
+	Remediation   string            `yaml:"remediation,omitempty" json:"remediation,omitempty"`
+	When          map[string]string `yaml:"when" json:"when"`
+	WaiverReason  string            `yaml:"waiver_reason,omitempty" json:"waiver_reason,omitempty"`
+	WaiverOwner   string            `yaml:"waiver_owner,omitempty" json:"waiver_owner,omitempty"`
+	WaiverExpires string            `yaml:"waiver_expires,omitempty" json:"waiver_expires,omitempty"`
 }
 
 type GitHubConfig struct {

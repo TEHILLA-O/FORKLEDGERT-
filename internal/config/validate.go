@@ -84,6 +84,9 @@ func (c Config) Validate() error {
 		if len(rule.When) == 0 {
 			errs = append(errs, fmt.Sprintf("policy.rules[%d] needs at least one condition", i))
 		}
+		if rule.WaiverExpires != "" && strings.TrimSpace(rule.WaiverReason) == "" {
+			errs = append(errs, fmt.Sprintf("policy.rules[%d] waiver needs a reason", i))
+		}
 	}
 	if c.GitHub.CommentMode != "" {
 		switch c.GitHub.CommentMode {

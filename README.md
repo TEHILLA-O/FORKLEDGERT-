@@ -48,7 +48,11 @@ Exact numbers depend on evidence. ForkLedger will not invent confidence.
 - Writes a machine readable report and a terminal report
 - Exits with codes that CI can act on
 
-The hosted product, GitHub App, and organisation-wide fork graph are designed. They are not required for the CLI to be useful.
+`forkledger serve` exposes a local HTTP API for stored scans. The web app at `apps/web` reads `/v1/attention` when that API is running.
+
+`--fetch` updates remote-tracking refs only. It does not checkout the working tree.
+
+`forkledger upgrade` replays local patches with cherry-pick inside an isolated worktree. Build and test commands run there only if `FORKLEDGER_ALLOW_BUILD=1` is set.
 
 ## Install
 
@@ -72,6 +76,11 @@ forkledger report [file]
 forkledger policy check
 forkledger explain
 forkledger doctor
+forkledger serve [:8080]
+forkledger ingest [report.json]
+forkledger discover <org>
+forkledger sbom
+forkledger vex
 forkledger version
 ```
 

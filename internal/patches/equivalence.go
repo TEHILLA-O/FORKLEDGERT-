@@ -10,11 +10,14 @@ import (
 )
 
 type UpstreamCommit struct {
-	Commit   git.Commit
-	PatchID  string
-	Files    []string
+	Commit    git.Commit
+	PatchID   string
+	Files     []string
 	Functions []string
-	Subject  string
+	Subject   string
+	IssueIDs  []string
+	Tokens    []string
+	ASTFuncs  []string
 }
 
 func DetectEquivalence(local []Patch, upstream []UpstreamCommit, cherry []git.Cherry, cfg config.Config) []Patch {
@@ -103,6 +106,62 @@ func DetectEquivalence(local []Patch, upstream []UpstreamCommit, cherry []git.Ch
 			if !found && bestOverlap >= 0.8 && (fnScore >= 0.5 || subj) {
 				match = overlapHit
 				found = true
+			}
+		}
+
+		bestTok := 0.0
+		var tokHit UpstreamCommit
+		for _, u := range upstream {
+			if len(p.Tokens) == 0 || len(u.Tokens) == 0 {
+				continue
+			}
+			score := TokenSimilarity(p.Tokens, u.Tokens)
+			if score > bestTok {
+				bestTok = score
+				tokHit = u
+			}
+		}
+		if bestTok >= 0.7 {
+			layers = append(layers, "normalized-diff")
+			items = append(items, evidence.New(evidence.KindNormalizedDiff, fmt.Sprintf("normalised diff tokens overlap %.0f%%", bestTok*100)).
+				WithSource(p.Commit).WithTarget(tokHit.Commit.Hash).WithWeight(12))
+			if !found {
+				match = tokHit
+				found = true
+			}
+		}
+
+		for _, u := range upstream {
+			if shared := intersectStrings(p.IssueIDs, u.IssueIDs); len(shared) > 0 {
+				layers = append(layers, "issue-id")
+				items = append(items, evidence.New(evidence.KindSharedIssueID, "shared issue identifiers: "+strings.Join(shared, ", ")).
+					WithSource(p.Commit).WithTarget(u.Commit.Hash).WithWeight(18))
+				if !found {
+					match = u
+					found = true
+				}
+				break
+			}
+		}
+
+		if len(p.ASTFuncs) > 0 {
+			bestAST := 0.0
+			var astHit UpstreamCommit
+			for _, u := range upstream {
+				score := jaccard(p.ASTFuncs, u.ASTFuncs)
+				if score > bestAST {
+					bestAST = score
+					astHit = u
+				}
+			}
+			if bestAST >= 0.6 {
+				layers = append(layers, "ast")
+				items = append(items, evidence.New(evidence.KindASTSimilarity, fmt.Sprintf("Go function set overlap %.0f%%", bestAST*100)).
+					WithSource(p.Commit).WithTarget(astHit.Commit.Hash).WithWeight(10))
+				if !found && bestAST >= 0.8 {
+					match = astHit
+					found = true
+				}
 			}
 		}
 
@@ -206,6 +265,20 @@ func unique(in []string) []string {
 		}
 		seen[s] = struct{}{}
 		out = append(out, s)
+	}
+	return out
+}
+
+func intersectStrings(a, b []string) []string {
+	sb := map[string]struct{}{}
+	for _, x := range b {
+		sb[strings.ToUpper(x)] = struct{}{}
+	}
+	var out []string
+	for _, x := range a {
+		if _, ok := sb[strings.ToUpper(x)]; ok {
+			out = append(out, x)
+		}
 	}
 	return out
 }

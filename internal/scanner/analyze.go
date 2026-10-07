@@ -32,14 +32,17 @@ type Engine struct {
 	Git     *git.Executor
 	GitHub  *upstream.GitHubClient
 	OSV     *security.OSV
+	GHSA    *security.GHSA
 	Log     *logging.Logger
 }
 
 func New(log *logging.Logger) *Engine {
+	token := os.Getenv("FORKLEDGER_GITHUB_TOKEN")
 	return &Engine{
 		Git:    git.NewExecutor(log),
-		GitHub: upstream.NewGitHubClient(os.Getenv("FORKLEDGER_GITHUB_TOKEN")),
+		GitHub: upstream.NewGitHubClient(token),
 		OSV:    security.NewOSV(),
+		GHSA:   security.NewGHSA(token),
 		Log:    log,
 	}
 }
@@ -50,8 +53,13 @@ func (e *Engine) Analyze(ctx context.Context, opt Options) (*report.Report, erro
 	if log == nil {
 		log = e.Log
 	}
-	if opt.GitHubToken != "" && e.GitHub != nil {
-		e.GitHub.Token = opt.GitHubToken
+	if opt.GitHubToken != "" {
+		if e.GitHub != nil {
+			e.GitHub.Token = opt.GitHubToken
+		}
+		if e.GHSA != nil {
+			e.GHSA.Token = opt.GitHubToken
+		}
 	}
 
 	repo, err := git.Open(ctx, opt.Path, e.Git)
@@ -60,25 +68,44 @@ func (e *Engine) Analyze(ctx context.Context, opt Options) (*report.Report, erro
 	}
 	log.Info("inspecting %s", repo.WorkTree)
 
+	remotes, err := repo.Remotes(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rep := &report.Report{
+		SchemaVersion: report.SchemaVersion,
+		GeneratedAt:   time.Now().UTC(),
+		Repository: report.RepositoryInfo{
+			Path: repo.WorkTree,
+		},
+	}
+	if opt.Fetch {
+		name := git.FetchRemoteName(remotes, "")
+		if name == "" {
+			for _, r := range remotes {
+				if strings.EqualFold(r.Name, "origin") {
+					name = r.Name
+					break
+				}
+			}
+		}
+		if name != "" {
+			if err := repo.Fetch(ctx, name); err != nil {
+				rep.Warnings = append(rep.Warnings, "fetch "+name+": "+err.Error())
+			} else {
+				log.Info("fetched %s without touching the working tree", name)
+				remotes, _ = repo.Remotes(ctx)
+			}
+		}
+	}
+
 	head, err := repo.Head(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("HEAD: %w", err)
 	}
 	branch, _ := repo.SymbolicHead(ctx)
-	remotes, err := repo.Remotes(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	rep := &report.Report{
-		SchemaVersion: report.SchemaVersion,
-		GeneratedAt:   time.Now().UTC(),
-		Repository: report.RepositoryInfo{
-			Path:   repo.WorkTree,
-			Head:   head,
-			Branch: branch,
-		},
-	}
+	rep.Repository.Head = head
+	rep.Repository.Branch = branch
 	for _, r := range remotes {
 		rep.Repository.Remotes = append(rep.Repository.Remotes, report.Remote{
 			Name: r.Name,
@@ -127,10 +154,14 @@ func (e *Engine) Analyze(ctx context.Context, opt Options) (*report.Report, erro
 		rep.Security.Findings = security.Interpret(advisories, toPatches(rep), firstNonEmpty(opt.Config.ExpectedBaseline, rep.Lineage.Baseline), opt.Config)
 		rep.Security.MissingUpstreamFixes = len(security.MissingFixes(rep.Security.Findings))
 		rep.Security.NeedsInvestigation = len(security.NeedsInvestigation(rep.Security.Findings))
-		rep.Security.VEX = security.FromFindings(rep.Repository.Path, rep.Security.Findings)
 	} else if opt.Offline {
 		rep.Warnings = append(rep.Warnings, "offline mode skipped OSV queries")
 	}
+	rep.Security.VEX = security.FromFindings(rep.Repository.Path, rep.Security.Findings)
+	rep.Security.OpenVEX = security.OpenVEX(rep.Repository.Path, rep.Security.Findings)
+	in := security.InputFrom(rep.Repository.Path, firstNonEmpty(opt.Config.ExpectedBaseline, rep.Lineage.Baseline), rep.Upstream.Selected, rep.Security.Findings)
+	rep.Security.CycloneDX = security.CycloneDX(in, opt.Config)
+	rep.Security.SPDX = security.SPDX(in, opt.Config)
 
 	sigs, err := fingerprint.DefaultRegistry().Compute(ctx, repo.WorkTree)
 	if err != nil {
@@ -219,6 +250,8 @@ func (e *Engine) analyzeLineage(ctx context.Context, repo *git.Repository, head,
 			Files:     fileNames(files),
 			Functions: patches.UniqueFunctions(git.ParseHunks(patch)),
 			Subject:   c.Subject,
+			IssueIDs:  patches.IssueIDs(c.Subject, c.Body),
+			Tokens:    patches.TokenizePatch(patch),
 		})
 	}
 	if ids, err := repo.PatchIDs(ctx, upHashes); err == nil {
@@ -307,6 +340,9 @@ func (e *Engine) queryAdvisories(ctx context.Context, repo *git.Repository, remo
 			url = "https://" + det.Selected.Identity
 		}
 		add(e.OSV.Query(ctx, security.Query{RepoURL: url, Version: rep.Lineage.Baseline}))
+		if gh, ok := upstream.ParseGitHub(det.Selected.Identity); ok && e.GHSA != nil {
+			add(e.GHSA.QueryRepo(ctx, gh.Owner, gh.Name))
+		}
 	}
 	_ = repo
 	_ = remotes

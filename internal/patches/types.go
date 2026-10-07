@@ -108,6 +108,9 @@ type Patch struct {
 	ConflictReason   string           `json:"conflict_reason,omitempty"`
 	SecurityRelevant bool             `json:"security_relevant"`
 	Evidence         []evidence.Item  `json:"evidence,omitempty"`
+	IssueIDs         []string         `json:"issue_ids,omitempty"`
+	Tokens           []string         `json:"-"`
+	ASTFuncs         []string         `json:"ast_functions,omitempty"`
 }
 
 type Equivalence struct {

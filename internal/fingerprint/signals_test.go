@@ -27,13 +27,24 @@ func TestPlaceholdersNotReady(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var minhash Signal
+	var minhash, simhash, tlsh Signal
 	for _, s := range sigs {
-		if s.Kind == KindMinHash {
+		switch s.Kind {
+		case KindMinHash:
 			minhash = s
+		case KindSimHash:
+			simhash = s
+		case KindTLSH:
+			tlsh = s
 		}
 	}
-	if minhash.Ready {
-		t.Fatal("MinHash must remain a reserved signal until it is implemented")
+	if !minhash.Ready || minhash.Value == "" {
+		t.Fatalf("MinHash should be ready: %+v", minhash)
+	}
+	if !simhash.Ready || simhash.Value == "" {
+		t.Fatalf("SimHash should be ready: %+v", simhash)
+	}
+	if tlsh.Ready {
+		t.Fatal("TLSH remains reserved until a real implementation exists")
 	}
 }

@@ -81,6 +81,9 @@ func Build(ctx context.Context, repo *git.Repository, commits []git.Commit, cfg 
 			Status:           status,
 			SecurityRelevant: cat == CategorySecurity,
 			Evidence:         ev,
+			IssueIDs:         IssueIDs(c.Subject, c.Body),
+			Tokens:           TokenizePatch(patch),
+			ASTFuncs:         goFuncsAt(ctx, repo, c.Hash, files),
 		}
 		if LooksSecurity(p) {
 			p.SecurityRelevant = true
@@ -164,6 +167,26 @@ func matchOverride(overrides map[string]config.PatchClassification, hash string)
 		}
 	}
 	return config.PatchClassification{}, false
+}
+
+func goFuncsAt(ctx context.Context, repo *git.Repository, commit string, files []git.FileChange) []string {
+	var out []string
+	n := 0
+	for _, f := range files {
+		if n >= 8 {
+			break
+		}
+		if !strings.HasSuffix(strings.ToLower(f.Path), ".go") {
+			continue
+		}
+		src, err := repo.FileContents(ctx, commit, f.Path)
+		if err != nil {
+			continue
+		}
+		out = append(out, ParseGoFunctions(src, f.Path)...)
+		n++
+	}
+	return unique(out)
 }
 
 func short(hash string) string {

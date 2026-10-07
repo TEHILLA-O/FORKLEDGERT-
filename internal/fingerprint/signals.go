@@ -56,8 +56,8 @@ func DefaultRegistry() *Registry {
 	return NewRegistry(
 		NormalizedTree{},
 		DirectorySignature{},
-		placeholder{KindMinHash, "MinHash is reserved for detached copies with no shared Git history."},
-		placeholder{KindSimHash, "SimHash is reserved for near-duplicate file detection."},
+		MinHash{},
+		SimHash{},
 		placeholder{KindTLSH, "TLSH is reserved for fuzzy hashing of larger blobs."},
 		placeholder{KindSsdeep, "ssdeep is reserved for fuzzy hashing when the operator enables it."},
 		placeholder{KindASTFingerprint, "AST fingerprints need language parsers. Git hunk headers stand in for now."},
