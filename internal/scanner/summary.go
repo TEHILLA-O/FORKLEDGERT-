@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/forkledger/forkledger/internal/report"
+	"github.com/TEHILLA-O/forkledger/internal/report"
 )
 
 func BuildSummary(rep *report.Report) report.Summary {

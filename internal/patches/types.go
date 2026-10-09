@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/forkledger/forkledger/internal/evidence"
-	"github.com/forkledger/forkledger/internal/git"
+	"github.com/TEHILLA-O/forkledger/internal/evidence"
+	"github.com/TEHILLA-O/forkledger/internal/git"
 )
 
 type Category string

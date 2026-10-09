@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/forkledger/forkledger/internal/config"
-	"github.com/forkledger/forkledger/internal/report"
-	"github.com/forkledger/forkledger/internal/security"
+	"github.com/TEHILLA-O/forkledger/internal/config"
+	"github.com/TEHILLA-O/forkledger/internal/report"
+	"github.com/TEHILLA-O/forkledger/internal/security"
 )
 
 func Check(cfg config.Config, rep *report.Report) []report.PolicyViolation {

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/forkledger/forkledger/internal/config"
-	"github.com/forkledger/forkledger/internal/evidence"
-	"github.com/forkledger/forkledger/internal/git"
-	"github.com/forkledger/forkledger/internal/logging"
+	"github.com/TEHILLA-O/forkledger/internal/config"
+	"github.com/TEHILLA-O/forkledger/internal/evidence"
+	"github.com/TEHILLA-O/forkledger/internal/git"
+	"github.com/TEHILLA-O/forkledger/internal/logging"
 )
 
 type InventoryOptions struct {

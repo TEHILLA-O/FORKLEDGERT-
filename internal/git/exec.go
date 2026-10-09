@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/forkledger/forkledger/internal/logging"
+	"github.com/TEHILLA-O/forkledger/internal/logging"
 )
 
 const DefaultTimeout = 2 * time.Minute
