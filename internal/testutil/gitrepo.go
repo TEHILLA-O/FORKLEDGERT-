@@ -122,8 +122,11 @@ func BuildForkWorld(t *testing.T) (upstreamDir, forkDir string) {
 	Write(t, forkDir, "src/util.go", "package src\n\nfunc Helper() int { return 2 }\n\nfunc Extra() int { return 9 }\n")
 	CommitAll(t, forkDir, "feat: add Extra helper used by internal callers")
 
+	// Upstream takes the same change under its own message. If the message, tree,
+	// parent and timestamp all matched the fork commit, Git would produce the
+	// identical commit hash and the fork patch would vanish from the inventory.
 	Write(t, upstreamDir, "src/auth.go", "package src\n\nfunc TokenRefresh() string {\n\treturn \"v1-internal\"\n}\n")
-	CommitAll(t, upstreamDir, "compat: retain legacy token refresh behaviour")
+	CommitAll(t, upstreamDir, "auth: keep legacy token refresh value")
 
 	Write(t, upstreamDir, "src/security.go", "package src\n\nfunc Sanitize(s string) string { return s }\n")
 	CommitAll(t, upstreamDir, "security: sanitize untrusted input (CVE-2024-0001)")
