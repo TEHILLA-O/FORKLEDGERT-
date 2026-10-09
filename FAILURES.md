@@ -13,7 +13,7 @@ Honest engineering notes for this project. Nothing here is invented for polish.
 
 1. **CI went red on the second commit.** After `1176ddf`, `TestAnalyzeForkWorld` in `internal/scanner` expected 3 local patches in the fixture fork and found 2. The cause was the test fixture, not the analyser: the fork commit and its upstream copy had the same message, tree, parent and author, and were created in the same second, so Git gave them the same commit hash and the fork patch looked like it was already upstream. The first CI run only passed because the two commits happened to land in different seconds.
 2. **Flags after the path are ignored.** `forkledger analyze . --json` prints the terminal report, while `forkledger analyze --json .` prints JSON. This is standard Go `flag` parsing stopping at the first positional argument. **Documented in the README, not changed in code yet.**
-3. **Install instructions pointed at a repository that does not exist.** The Go module path was `github.com/forkledger/forkledger`, which did not match where the code actually lives. The repository is now `TEHILLA-O/forkledger` and the module path is `github.com/TEHILLA-O/forkledger`, so `go install github.com/TEHILLA-O/forkledger/cmd/forkledger@latest` works.
+3. **Install instructions pointed at a repository that does not exist.** The Go module path was `github.com/forkledger/forkledger`, which did not match where the code actually lives. The repository is now `TEHILLA-O/fork_ledger` and the module path is `github.com/TEHILLA-O/fork_ledger`, so `go install github.com/TEHILLA-O/fork_ledger/cmd/forkledger@latest` works.
 
 ## How it was resolved
 

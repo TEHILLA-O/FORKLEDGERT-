@@ -7,15 +7,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/TEHILLA-O/forkledger/internal/config"
-	"github.com/TEHILLA-O/forkledger/internal/evidence"
-	"github.com/TEHILLA-O/forkledger/internal/git"
-	"github.com/TEHILLA-O/forkledger/internal/isolate"
-	"github.com/TEHILLA-O/forkledger/internal/logging"
-	"github.com/TEHILLA-O/forkledger/internal/patches"
-	"github.com/TEHILLA-O/forkledger/internal/report"
-	"github.com/TEHILLA-O/forkledger/internal/scanner"
-	"github.com/TEHILLA-O/forkledger/internal/upstream"
+	"github.com/TEHILLA-O/fork_ledger/internal/config"
+	"github.com/TEHILLA-O/fork_ledger/internal/evidence"
+	"github.com/TEHILLA-O/fork_ledger/internal/git"
+	"github.com/TEHILLA-O/fork_ledger/internal/isolate"
+	"github.com/TEHILLA-O/fork_ledger/internal/logging"
+	"github.com/TEHILLA-O/fork_ledger/internal/patches"
+	"github.com/TEHILLA-O/fork_ledger/internal/report"
+	"github.com/TEHILLA-O/fork_ledger/internal/scanner"
+	"github.com/TEHILLA-O/fork_ledger/internal/upstream"
 )
 
 type PatchOutcome struct {

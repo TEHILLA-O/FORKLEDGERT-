@@ -71,7 +71,7 @@ Most companies run patched copies of open source somewhere: a vendored library, 
 Go 1.22 or newer and Git 2.38 or newer are required.
 
 ```
-git clone https://github.com/TEHILLA-O/forkledger.git forkledger
+git clone https://github.com/TEHILLA-O/fork_ledger.git forkledger
 cd forkledger
 go build -o bin/forkledger ./cmd/forkledger
 go test ./...
@@ -80,7 +80,7 @@ go test ./...
 Or install straight from the module path:
 
 ```
-go install github.com/TEHILLA-O/forkledger/cmd/forkledger@latest
+go install github.com/TEHILLA-O/fork_ledger/cmd/forkledger@latest
 ```
 
 ## Commands

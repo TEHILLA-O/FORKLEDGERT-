@@ -1,4 +1,4 @@
-module github.com/TEHILLA-O/forkledger
+module github.com/TEHILLA-O/fork_ledger
 
 go 1.22
 

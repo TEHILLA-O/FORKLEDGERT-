@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TEHILLA-O/forkledger/internal/config"
-	"github.com/TEHILLA-O/forkledger/internal/evidence"
-	"github.com/TEHILLA-O/forkledger/internal/report"
+	"github.com/TEHILLA-O/fork_ledger/internal/config"
+	"github.com/TEHILLA-O/fork_ledger/internal/evidence"
+	"github.com/TEHILLA-O/fork_ledger/internal/report"
 )
 
 func ScoreHealth(rep *report.Report, cfg config.Config) report.Health {

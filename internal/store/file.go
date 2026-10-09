@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/TEHILLA-O/forkledger/internal/report"
+	"github.com/TEHILLA-O/fork_ledger/internal/report"
 )
 
 type Attention struct {

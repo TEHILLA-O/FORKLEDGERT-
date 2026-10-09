@@ -3,8 +3,8 @@ package patches
 import (
 	"testing"
 
-	"github.com/TEHILLA-O/forkledger/internal/config"
-	"github.com/TEHILLA-O/forkledger/internal/git"
+	"github.com/TEHILLA-O/fork_ledger/internal/config"
+	"github.com/TEHILLA-O/fork_ledger/internal/git"
 )
 
 func TestPatchIDEquivalence(t *testing.T) {

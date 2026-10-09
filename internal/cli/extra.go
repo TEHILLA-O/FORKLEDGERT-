@@ -8,11 +8,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/TEHILLA-O/forkledger/internal/api"
-	"github.com/TEHILLA-O/forkledger/internal/discover"
-	"github.com/TEHILLA-O/forkledger/internal/report"
-	"github.com/TEHILLA-O/forkledger/internal/security"
-	"github.com/TEHILLA-O/forkledger/internal/store"
+	"github.com/TEHILLA-O/fork_ledger/internal/api"
+	"github.com/TEHILLA-O/fork_ledger/internal/discover"
+	"github.com/TEHILLA-O/fork_ledger/internal/report"
+	"github.com/TEHILLA-O/fork_ledger/internal/security"
+	"github.com/TEHILLA-O/fork_ledger/internal/store"
 )
 
 func cmdServe(args []string) int {

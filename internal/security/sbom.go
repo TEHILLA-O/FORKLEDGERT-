@@ -3,7 +3,7 @@ package security
 import (
 	"time"
 
-	"github.com/TEHILLA-O/forkledger/internal/config"
+	"github.com/TEHILLA-O/fork_ledger/internal/config"
 )
 
 type SBOMInput struct {

@@ -3,7 +3,7 @@ package security
 import (
 	"context"
 
-	"github.com/TEHILLA-O/forkledger/internal/evidence"
+	"github.com/TEHILLA-O/fork_ledger/internal/evidence"
 )
 
 type Finding struct {

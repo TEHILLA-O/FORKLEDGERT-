@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/TEHILLA-O/forkledger/internal/config"
-	"github.com/TEHILLA-O/forkledger/internal/evidence"
-	"github.com/TEHILLA-O/forkledger/internal/patches"
+	"github.com/TEHILLA-O/fork_ledger/internal/config"
+	"github.com/TEHILLA-O/fork_ledger/internal/evidence"
+	"github.com/TEHILLA-O/fork_ledger/internal/patches"
 )
 
 func Interpret(advisories []Advisory, local []patches.Patch, baseline string, cfg config.Config) []Finding {

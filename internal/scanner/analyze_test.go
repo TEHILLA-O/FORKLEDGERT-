@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/TEHILLA-O/forkledger/internal/config"
-	"github.com/TEHILLA-O/forkledger/internal/logging"
-	"github.com/TEHILLA-O/forkledger/internal/scanner"
-	"github.com/TEHILLA-O/forkledger/internal/testutil"
+	"github.com/TEHILLA-O/fork_ledger/internal/config"
+	"github.com/TEHILLA-O/fork_ledger/internal/logging"
+	"github.com/TEHILLA-O/fork_ledger/internal/scanner"
+	"github.com/TEHILLA-O/fork_ledger/internal/testutil"
 )
 
 func TestAnalyzeForkWorld(t *testing.T) {

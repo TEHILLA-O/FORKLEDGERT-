@@ -3,8 +3,8 @@ package report
 import (
 	"time"
 
-	"github.com/TEHILLA-O/forkledger/internal/evidence"
-	"github.com/TEHILLA-O/forkledger/internal/security"
+	"github.com/TEHILLA-O/fork_ledger/internal/evidence"
+	"github.com/TEHILLA-O/fork_ledger/internal/security"
 )
 
 const SchemaVersion = "0.1.0"

@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/TEHILLA-O/forkledger/internal/cli"
+	"github.com/TEHILLA-O/fork_ledger/internal/cli"
 )
 
 func main() {

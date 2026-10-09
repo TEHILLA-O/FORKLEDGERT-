@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TEHILLA-O/forkledger/internal/githubapp"
-	"github.com/TEHILLA-O/forkledger/internal/report"
-	"github.com/TEHILLA-O/forkledger/internal/store"
-	"github.com/TEHILLA-O/forkledger/internal/version"
+	"github.com/TEHILLA-O/fork_ledger/internal/githubapp"
+	"github.com/TEHILLA-O/fork_ledger/internal/report"
+	"github.com/TEHILLA-O/fork_ledger/internal/store"
+	"github.com/TEHILLA-O/fork_ledger/internal/version"
 )
 
 type Server struct {

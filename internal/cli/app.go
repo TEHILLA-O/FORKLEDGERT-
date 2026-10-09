@@ -11,14 +11,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TEHILLA-O/forkledger/internal/config"
-	"github.com/TEHILLA-O/forkledger/internal/git"
-	"github.com/TEHILLA-O/forkledger/internal/logging"
-	"github.com/TEHILLA-O/forkledger/internal/policy"
-	"github.com/TEHILLA-O/forkledger/internal/report"
-	"github.com/TEHILLA-O/forkledger/internal/scanner"
-	"github.com/TEHILLA-O/forkledger/internal/upgrade"
-	"github.com/TEHILLA-O/forkledger/internal/version"
+	"github.com/TEHILLA-O/fork_ledger/internal/config"
+	"github.com/TEHILLA-O/fork_ledger/internal/git"
+	"github.com/TEHILLA-O/fork_ledger/internal/logging"
+	"github.com/TEHILLA-O/fork_ledger/internal/policy"
+	"github.com/TEHILLA-O/fork_ledger/internal/report"
+	"github.com/TEHILLA-O/fork_ledger/internal/scanner"
+	"github.com/TEHILLA-O/fork_ledger/internal/upgrade"
+	"github.com/TEHILLA-O/fork_ledger/internal/version"
 )
 
 type Globals struct {
