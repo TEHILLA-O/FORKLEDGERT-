@@ -6,35 +6,47 @@ It discovers repositories that were copied, forked, vendored, patched, or otherw
 
 It is not another Git dashboard. It is not another vulnerability scanner. It is not an AI wrapper. Git remains the source of truth for history. Security databases remain the source of truth for advisory metadata. ForkLedger interprets those facts in the context of a modified tree.
 
-## First working experience
+## First run
 
 ```
 forkledger analyze .
 ```
 
-The command inspects the current repository and prints a report similar to this:
+This is a real run against a clone of `mattn/go-isatty`, rolled back five commits, with `origin` renamed to `upstream` and one local patch on top (offline mode):
 
 ```
 ForkLedger Analysis
 
-Detected upstream                 redis/redis
-Baseline                          7.2.4
-Current upstream                  8.2.1
-Local modifications               43 patches
-Changed lines                     7241
-Likely upstream equivalents       9 patches
-Potentially obsolete              6 patches
-Potential conflicts               11 patches
+Detected upstream                github.com/mattn/go-isatty
+Baseline                         0.0.20
+Current upstream                 v0.0.24
+Fork point                       433c12b4c9fa
+Ahead / behind                   1 / 5
+
+Local modifications              1 patch
+Changed lines                    1
+Likely upstream equivalents      0 patches
+Potentially obsolete             0 patches
+Potential conflicts              1 patch
 
 Security
-  Relevant upstream fixes missing 2
-  Findings needing investigation  1
+  Relevant upstream fixes missing 0
+  Findings needing investigation 0
 
-Suggested lifecycle action        REBASE
-Confidence                        HIGH (89). This is an estimate from evidence, not a guarantee.
+Suggested lifecycle action       RETAIN
+Confidence                       LOW (35). This is an estimate from evidence, not a guarantee.
+
+Fork health 89
+  upstream drift                 -1. 5 commits behind upstream
+  conflicting patches            -2. 1 patches touch files also changed upstream
+  ownership                      -8. no owner is recorded in forkledger.yaml
 ```
 
-Exact numbers depend on evidence. ForkLedger will not invent confidence.
+Confidence is low here because there is only one tiny patch and no owner in `forkledger.yaml`. Exact numbers depend on evidence. ForkLedger will not invent confidence.
+
+## Why this matters
+
+Most companies run patched copies of open source somewhere: a vendored library, an old fork of an SDK, an internal build of a database. Those patches quietly go stale, upstream security fixes never land, and nobody remembers why the fork exists. ForkLedger turns that into a list of facts a team can act on: what was changed, what upstream already fixed, what will conflict, and who owns it.
 
 ## What v0.1 does
 
@@ -59,9 +71,10 @@ Exact numbers depend on evidence. ForkLedger will not invent confidence.
 Go 1.22 or newer and Git 2.38 or newer are required.
 
 ```
-git clone https://github.com/forkledger/forkledger
+git clone https://github.com/TEHILLA-O/FORKLEDGERT-.git forkledger
 cd forkledger
 go build -o bin/forkledger ./cmd/forkledger
+go test ./...
 ```
 
 ## Commands
@@ -84,7 +97,7 @@ forkledger vex
 forkledger version
 ```
 
-Useful flags:
+Useful flags (put them before the path, for example `forkledger analyze --json --offline .`):
 
 ```
 --json
@@ -118,7 +131,11 @@ It does not upload source trees. See `docs/privacy.md`.
 
 ## Status
 
-This is v0.1. The intelligence engine is the product. Later releases add upgrade worktree simulation, organisation discovery, the web control plane, and a GitHub App with minimal permissions.
+This is v0.1. Local analysis, isolated upgrade replay, the local scan API and the file store work today. The web control plane in `apps/web` reads from the local API and is early. The GitHub App webhook handler and organisation discovery exist in code but are not production tested yet. Known gaps are written down in [FAILURES.md](FAILURES.md).
+
+## Stack
+
+Go 1.22 for the CLI and analysis engine, Git plumbing through `git` subprocesses, a JSON file store for scans (with a relational schema drafted for the future control plane), OSV and GHSA for advisories, CycloneDX or SPDX SBOM and OpenVEX output, and a small Next.js app for the attention queue. CI runs `go test` and `go vet` on every push, and `action.yml` lets other repositories run ForkLedger in a pull request.
 
 ## License
 
